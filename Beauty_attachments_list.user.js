@@ -17,11 +17,10 @@
     if ($(this).length > 1)
       return $.map($(this), function(elm){ return $(elm).outerHTML(); }).join('');
     return $(this).clone().wrap('<p/>').parent().html();
-  };
+  };  
 
   let $attachContainer;
   const observer = new MutationObserver(mutationCallback);
-
   observerStart();
 
   function mutationCallback() {
@@ -36,7 +35,7 @@
   }
 
   function correctList($container){
-    if (!$('li.aui-list-item a#attachment-view-mode-gallery').hasClass('aui-checked')){
+    if (!$('li.aui-list-item a#attachment-view-mode-gallery').hasClass('aui-checked'){
       return;
     }
 
