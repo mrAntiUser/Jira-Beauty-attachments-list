@@ -1,27 +1,32 @@
 // ==UserScript==
 // @name         Beauty attachments list
+// @license      MIT
 // @namespace    argustelecom.ru
-// @version      0.1
-// @description
+// @version      1.0
+// @description  Beauty attachments list
 // @author       Andy BitOff
 // @include      *support.argustelecom.ru*
 // @grant        none
 // @require      https://code.jquery.com/jquery-3.3.1.min.js
-// @run-at       document-end
+// @run-at       document-start
 // ==/UserScript==
+
 
 (function(MutationObserver) {
   'use strict';
 
-  $.fn.outerHTML = function() {
-    if ($(this).length > 1)
-      return $.map($(this), function(elm){ return $(elm).outerHTML(); }).join('');
-    return $(this).clone().wrap('<p/>').parent().html();
-  };  
-
   let $attachContainer;
   const observer = new MutationObserver(mutationCallback);
-  observerStart();
+
+  const timId = setInterval(function() {
+    if ($('body').length === 0){ return };
+    clearInterval(timId);
+    new MutationObserver(function(){
+      if ($('div#attachmentmodule div.mod-content').length === 0){ return };
+      this.disconnect();
+      observerStart();
+    }).observe($('body').get(0), {childList: true});
+  }, 100);
 
   function mutationCallback() {
     observer.disconnect();
@@ -30,12 +35,15 @@
 
   function observerStart() {
     $attachContainer = $('div#attachmentmodule div.mod-content');
+    if ($attachContainer.find('ol#file_attachments_BAL').length !== 0){
+      return;
+    }
     correctList($attachContainer);
     observer.observe($attachContainer.get(0), {childList: true})
   }
 
   function correctList($container){
-    if (!$('li.aui-list-item a#attachment-view-mode-gallery').hasClass('aui-checked'){
+    if (!$('li.aui-list-item a#attachment-view-mode-gallery').hasClass('aui-checked')){
       return;
     }
 
@@ -43,7 +51,7 @@
     if ($appItems.length === 0){
       return;
     }
-    const $newAppItemsList = $('<ol id="file_attachments" class="item-attachments" data-sort-key="fileName" data-sort-order="asc"><ol>');
+    const $newAppItemsList = $('<ol id="file_attachments_BAL" class="item-attachments" data-sort-key="fileName" data-sort-order="asc"><ol>');
     const $newContainerAppList = $('<div></div>').append($newAppItemsList);
     $newContainerAppList.css({'display': 'inline-block', 'width': '100%'});
 
@@ -98,10 +106,16 @@
     const $item = setIcon($elm, itemData);
     return $(`<div class="twixi-block collapsed expander"><div class="twixi-wrap verbose"><a href="#" class="twixi"><span
             class="icon-default aui-icon aui-icon-small aui-iconfont-expanded"><span>Скрыть</span></span></a>
-            ${$item.outerHTML()}<dd class="zip-contents"><ol><li><div class="attachment-thumb"><img src="/images/icons/wait.gif">
+            ${outerHTML($item)}<dd class="zip-contents"><ol><li><div class="attachment-thumb"><img src="/images/icons/wait.gif">
             </div>Извлечение архива ...</li></ol></dd></dl></div><div class="twixi-wrap concise"><a href="#" class="twixi"><span
             class="icon-default aui-icon aui-icon-small aui-iconfont-collapsed"><span>Показать</span></span></a>
-            ${$item.outerHTML()}</dl></div></div>`);
+            ${outerHTML($item)}</dl></div></div>`);
+  }
+
+  function outerHTML($elms) {
+    if ($elms.length > 1)
+      return $.map($elms, function(elm){ return outerHTML($(elm)); }).join('');
+    return $elms.clone().wrap('<p/>').parent().html();
   }
 
   function setIcon($elm, itemData){
