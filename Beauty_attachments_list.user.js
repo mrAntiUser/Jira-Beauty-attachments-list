@@ -35,10 +35,9 @@
 
   function observerStart() {
     $attachContainer = $('div#attachmentmodule div.mod-content');
-    if ($attachContainer.find('ol#file_attachments_BAL').length !== 0){
-      return;
+    if ($attachContainer.find('ol#file_attachments_BAL').length === 0){
+      correctList($attachContainer);
     }
-    correctList($attachContainer);
     observer.observe($attachContainer.get(0), {childList: true})
   }
 
