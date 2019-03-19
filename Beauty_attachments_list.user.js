@@ -2,7 +2,7 @@
 // @name         Beauty attachments list
 // @license      MIT
 // @namespace    argustelecom.ru
-// @version      1.0
+// @version      1.1
 // @description  Beauty attachments list
 // @author       Andy BitOff
 // @include      *support.argustelecom.ru*
