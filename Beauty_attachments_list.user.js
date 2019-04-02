@@ -2,7 +2,7 @@
 // @name         Beauty attachments list
 // @license      MIT
 // @namespace    argustelecom.ru
-// @version      1.1
+// @version      1.3
 // @description  Beauty attachments list
 // @author       Andy BitOff
 // @include      *support.argustelecom.ru*
@@ -11,6 +11,14 @@
 // @run-at       document-start
 // ==/UserScript==
 
+/* RELEASE NOTES
+  1.3
+    Длинные списки (более 20 элементов) сворачиваются
+  1.2
+    Баг обновления списка
+  1.0
+    Release
+*/
 
 (function(MutationObserver) {
   'use strict';
@@ -24,6 +32,7 @@
     new MutationObserver(function(){
       if ($('div#attachmentmodule div.mod-content').length === 0){ return };
       this.disconnect();
+      addNewCss();
       observerStart();
     }).observe($('body').get(0), {childList: true});
   }, 100);
@@ -51,7 +60,22 @@
       return;
     }
     const $newAppItemsList = $('<ol id="file_attachments_BAL" class="item-attachments" data-sort-key="fileName" data-sort-order="asc"><ol>');
-    const $newContainerAppList = $('<div></div>').append($newAppItemsList);
+    const $newContainerAppList = $('<div></div>');
+    if ($appItems.length > 20){
+      $newContainerAppList.append($(`<div class="aui-button" style="width: 100%;"><b>
+                                     Показаны первые 10</b>. Нажмите чтобы посмотреть все ${$appItems.length}</div>`)
+          .click(function(){
+            $newAppItemsList.toggleClass('bal-crop-list');
+            if ($newAppItemsList.hasClass('bal-crop-list')) {
+              $(this).html(`<b>Показаны первые 10</b>. Нажмите чтобы посмотреть все ${$appItems.length}`);
+            }else{
+              $(this).html(`<b>Показаны все ${$appItems.length}</b>. Нажмите чтобы сократить до 10`);
+            }
+          }));
+      $newAppItemsList.css({'height': '325px'});
+      $newAppItemsList.addClass('bal-crop-list');
+    };
+    $newContainerAppList.append($newAppItemsList);
     $newContainerAppList.css({'display': 'inline-block', 'width': '100%'});
 
     $appItems.each(function(){
@@ -126,6 +150,22 @@
       } catch (err) {}
     });
     return $itemData;
+  }
+
+  function newCssClass(cssClass){
+    const head = document.head || document.getElementsByTagName('head')[0];
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode(cssClass));
+    head.appendChild(style);
+  }
+
+  function addNewCss(){
+    newCssClass(`
+      .bal-crop-list{
+        overflow-y: scroll;
+      }
+    `)
   }
 
 })(window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver);
