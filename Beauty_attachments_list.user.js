@@ -2,7 +2,7 @@
 // @name         Beauty attachments list
 // @license      MIT
 // @namespace    argustelecom.ru
-// @version      1.3
+// @version      1.4
 // @description  Beauty attachments list
 // @author       Andy BitOff
 // @include      *support.argustelecom.ru*
@@ -12,6 +12,8 @@
 // ==/UserScript==
 
 /* RELEASE NOTES
+  1.4
+    В редакторе текста пропадали элементы списка аттачментов. Поправил
   1.3
     Длинные списки (более 20 элементов) сворачиваются
   1.2
@@ -114,7 +116,7 @@
     });
 
     $container.append($newContainerAppList);
-    $appItems.remove();
+    $appItems.css('display', 'none');
   }
 
   function makeDefItem($elm, itemData){
