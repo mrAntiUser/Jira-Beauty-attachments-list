@@ -167,6 +167,9 @@
       .bal-crop-list{
         overflow-y: scroll;
       }
+      dd.attachment-date {
+        padding-right: 25px;
+      }
     `)
   }
 
